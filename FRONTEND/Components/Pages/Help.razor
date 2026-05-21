@@ -1,0 +1,52 @@
+@page "/help"
+@using FRONTEND.Components.Shared
+
+<PageTitle>About</PageTitle>
+
+<div class="help-scene">
+    <Search IsBackVisible="true" />
+
+    <div class="help-card">
+        <div class="help-header">
+            <svg class="help-vinyl-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/>
+            </svg>
+            <h1>Vinyl Collection</h1>
+        </div>
+
+        <p class="help-desc">
+            A personal archive of every vinyl record in the collection — flipping through covers,
+            ratings, tracklists, and Spotify links, all in one place.
+        </p>
+
+        <div class="help-divider"></div>
+
+        <ul class="help-features">
+            <li>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l1.45 3.26L17 7.27l-2.5 2.43.59 3.44L12 11.43l-3.09 1.71.59-3.44L7 7.27l3.55-.51z"/></svg>
+                Browse the full collection with cover art &amp; ratings
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
+                Flip covers to see the back sleeve
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+                Ranked list ordered by personal rating
+            </li>
+            <li>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                Open any album directly on Spotify
+            </li>
+        </ul>
+
+        <div class="help-divider"></div>
+
+        <a class="help-site-link" href="https://samkey.uk" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+            </svg>
+            samkey.uk
+        </a>
+    </div>
+</div>

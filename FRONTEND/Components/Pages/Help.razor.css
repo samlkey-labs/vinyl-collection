@@ -1,0 +1,138 @@
+.help-scene {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a1a;
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+}
+
+/* ─── Card ─── */
+.help-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    padding: 2.4rem 2.8rem;
+    width: 100%;
+    max-width: 520px;
+    color: #fff;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ─── Header ─── */
+.help-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1.1rem;
+}
+
+.help-vinyl-icon {
+    width: 36px;
+    height: 36px;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.help-header h1 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+/* ─── Description ─── */
+.help-desc {
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0 0 1.4rem;
+}
+
+/* ─── Divider ─── */
+.help-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 1.2rem 0;
+}
+
+/* ─── Feature list ─── */
+.help-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.help-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.help-features li svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+/* ─── Site link ─── */
+.help-site-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    padding: 0.55em 1.3em;
+    transition: background 0.2s ease, transform 0.2s cubic-bezier(.34, 1.56, .64, 1),
+                box-shadow 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.help-site-link:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 480px) {
+    .help-scene {
+        padding: 5rem 1rem 2rem;
+        align-items: flex-start;
+    }
+
+    .help-card {
+        padding: 1.8rem 1.4rem;
+        border-radius: 18px;
+    }
+
+    .help-header h1 {
+        font-size: 1.55rem;
+    }
+
+    .help-desc {
+        font-size: 0.9rem;
+    }
+
+    .help-features li {
+        font-size: 0.85rem;
+    }
+}

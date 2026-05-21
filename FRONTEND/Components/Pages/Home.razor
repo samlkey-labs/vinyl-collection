@@ -8,6 +8,7 @@
 @inject ICurrentAlbumColorService CurrentAlbumColorService
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
+@implements IAsyncDisposable
 
 @rendermode InteractiveServer
 
@@ -188,15 +189,23 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (firstRender)
+            await JS.InvokeVoidAsync("setHomeScrollLock", true);
+
         if (albums != null && albums.Count > 0 && currentAlbumIndex >= 0 && currentAlbumIndex < albums.Count)
         {
             var currentAlbum = albums[currentAlbumIndex];
             CurrentAlbumColorService.CurrentAlbumColor = currentAlbum.PrimaryColour ?? "#000000";
             var isBright = CurrentAlbumColorService.IsColorBright;
             var textColor = isBright ? "black" : "white";
-            
+
             await JS.InvokeVoidAsync("updateLayoutTextColor", textColor);
         }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await JS.InvokeVoidAsync("setHomeScrollLock", false);
     }
 
     private async void OpenSpotifyLink(string? link)

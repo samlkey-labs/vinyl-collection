@@ -3,6 +3,14 @@ html, body {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    html.home-no-scroll,
+    html.home-no-scroll body {
+        overflow: hidden;
+        height: 100%;
+    }
+}
+
 a, .btn-link {
     color: #006bb7;
 }

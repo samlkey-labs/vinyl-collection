@@ -23,6 +23,9 @@
         window.updateLayoutTextColor = function(color) {
             document.documentElement.style.setProperty('--layout-text-color', color);
         };
+        window.setHomeScrollLock = function(lock) {
+            document.documentElement.classList.toggle('home-no-scroll', lock);
+        };
     </script>
     <script src="js/searchbar.js"></script>
     <script src="js/iframeLoader.js"></script>
