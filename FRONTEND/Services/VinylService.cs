@@ -14,22 +14,24 @@ namespace FRONTEND.Services
     // Read-only: album data is managed directly in Cosmos DB, not through the app.
     public class VinylService : IVinylService
     {
-        private readonly VinylDbContext _context;
+        private readonly IDbContextFactory<VinylDbContext> _contextFactory;
 
-        public VinylService(VinylDbContext context)
+        public VinylService(IDbContextFactory<VinylDbContext> contextFactory)
         {
-            _context = context;
+            _contextFactory = contextFactory;
         }
 
         // Tracks are embedded in the album document, so no Include is needed.
         public async Task<List<Album>> GetAllAlbumsAsync()
         {
-            return await _context.Albums.ToListAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Albums.ToListAsync();
         }
 
         public async Task<Album?> GetAlbumByIdAsync(string id)
         {
-            return await _context.Albums.FirstOrDefaultAsync(a => a.Id == id);
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Albums.FirstOrDefaultAsync(a => a.Id == id);
         }
 
         public async Task<List<Album>> SearchAlbumsAsync(string query)
@@ -37,7 +39,8 @@ namespace FRONTEND.Services
             if (string.IsNullOrWhiteSpace(query))
                 return new List<Album>();
             var lowered = query.ToLower();
-            return await _context.Albums
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            return await context.Albums
                 .Where(a => a.Name!.ToLower().Contains(lowered) || a.Artist!.ToLower().Contains(lowered))
                 .ToListAsync();
         }
@@ -46,7 +49,8 @@ namespace FRONTEND.Services
         {
             // Cosmos DB can't ORDER BY a random value, so shuffle in memory.
             // The collection is small enough for this to be cheap.
-            var albums = await _context.Albums.ToListAsync();
+            await using var context = await _contextFactory.CreateDbContextAsync();
+            var albums = await context.Albums.ToListAsync();
             return albums.OrderBy(_ => Random.Shared.Next()).Take(count).ToList();
         }
     }

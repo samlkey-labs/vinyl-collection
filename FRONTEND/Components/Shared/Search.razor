@@ -101,7 +101,13 @@
         searchText = e.Value?.ToString() ?? "";
         if (!string.IsNullOrWhiteSpace(searchText))
         {
-            suggestions = await VinylService.SearchAlbumsAsync(searchText);
+            var query = searchText;
+            var results = await VinylService.SearchAlbumsAsync(query);
+
+            // A newer keystroke has started its own search; don't overwrite its results
+            if (query != searchText)
+                return;
+            suggestions = results;
 
             Console.WriteLine(suggestions.Count);
             if (suggestions.Count == 0) await CloseSuggestionsAsync();

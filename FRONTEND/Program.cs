@@ -17,12 +17,15 @@ var cosmosConnectionString = builder.Configuration["Cosmos:ConnectionString"];
 var cosmosEndpoint = builder.Configuration["Cosmos:Endpoint"];
 var cosmosDatabase = builder.Configuration["Cosmos:DatabaseName"] ?? "VinylCollection";
 
-// Create the credential once. The AddDbContext callback runs for every DbContext, and a new
-// credential instance each time makes EF build a new internal service provider per request,
-// which fails after 20 (ManyServiceProvidersCreatedWarning).
+// Create the credential once and share it. A new credential instance per DbContext makes EF
+// build a new internal service provider each time, which fails after 20
+// (ManyServiceProvidersCreatedWarning).
 var cosmosCredential = new DefaultAzureCredential();
 
-builder.Services.AddDbContext<VinylDbContext>(options =>
+// A factory rather than AddDbContext: in Blazor Server a scoped DbContext lives for the whole
+// circuit, so overlapping queries (e.g. typing quickly in search) would share one instance and
+// fail with "A second operation was started on this context". VinylService creates a context per call.
+builder.Services.AddDbContextFactory<VinylDbContext>(options =>
 {
     // The app only reads data, so skip change tracking
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
