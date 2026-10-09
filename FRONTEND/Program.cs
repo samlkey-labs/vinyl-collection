@@ -17,6 +17,11 @@ var cosmosConnectionString = builder.Configuration["Cosmos:ConnectionString"];
 var cosmosEndpoint = builder.Configuration["Cosmos:Endpoint"];
 var cosmosDatabase = builder.Configuration["Cosmos:DatabaseName"] ?? "VinylCollection";
 
+// Create the credential once. The AddDbContext callback runs for every DbContext, and a new
+// credential instance each time makes EF build a new internal service provider per request,
+// which fails after 20 (ManyServiceProvidersCreatedWarning).
+var cosmosCredential = new DefaultAzureCredential();
+
 builder.Services.AddDbContext<VinylDbContext>(options =>
 {
     // The app only reads data, so skip change tracking
@@ -24,7 +29,7 @@ builder.Services.AddDbContext<VinylDbContext>(options =>
     if (!string.IsNullOrEmpty(cosmosConnectionString))
         options.UseCosmos(cosmosConnectionString, cosmosDatabase);
     else if (!string.IsNullOrEmpty(cosmosEndpoint))
-        options.UseCosmos(cosmosEndpoint, new DefaultAzureCredential(), cosmosDatabase);
+        options.UseCosmos(cosmosEndpoint, cosmosCredential, cosmosDatabase);
     else
         throw new InvalidOperationException("Set Cosmos:ConnectionString or Cosmos:Endpoint.");
 });
