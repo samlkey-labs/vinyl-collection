@@ -100,6 +100,7 @@
     private List<Album> rankedAlbums = new List<Album>();
     private int currentAlbumIndex = 0;
     private bool isLoading = true;
+    private bool gesturesInitialised = false;
     private ElementReference _keyTarget;
 
     protected override async Task OnInitializedAsync() {
@@ -123,8 +124,10 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        // Not firstRender: that render is the loading screen, where _keyTarget doesn't exist yet
+        if (!gesturesInitialised && rankedAlbums.Count > 0)
         {
+            gesturesInitialised = true;
             await JS.InvokeVoidAsync("carouselGestures.init", _keyTarget, DotNetObjectReference.Create(this));
         }
     }

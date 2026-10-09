@@ -195,7 +195,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        // Not firstRender: that render is the loading screen, where the iframe doesn't exist yet
+        if (objRef == null && album != null)
         {
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("attachIframeLoadedHandler", "spotifyIframe", objRef);
