@@ -25,6 +25,14 @@ var namePrefix = 'slk-vc'
 ])
 param skuName string = 'B1'
 
+@description('Custom domain for the web app, e.g. vinyl-collection.co.uk. Leave empty for none.')
+param customDomain string = ''
+
+@description('''Issue a free App Service Managed Certificate for customDomain and bind it.
+Deploy with false first (adds the domain), point the domain's A record at the app,
+then deploy with true: the certificate is only issued once DNS resolves to the app.''')
+param customDomainCertificate bool = false
+
 var cosmosDatabaseName = 'VinylCollection'
 
 // Built-in "Cosmos DB Built-in Data Reader" data-plane role: the app never writes
@@ -140,6 +148,42 @@ resource appCosmosAccess 'Microsoft.DocumentDB/databaseAccounts/sqlRoleAssignmen
   }
 }
 
+// ─── Custom domain ───
+// Pass 1 (customDomainCertificate = false): add the domain without TLS. Azure verifies
+// ownership with the asuid.<domain> TXT record, so this works before the A record moves.
+resource hostNameBinding 'Microsoft.Web/sites/hostNameBindings@2024-04-01' = if (!empty(customDomain) && !customDomainCertificate) {
+  parent: app
+  name: !empty(customDomain) ? customDomain : 'none'
+  properties: {
+    siteName: app.name
+    hostNameType: 'Verified'
+    customHostNameDnsRecordType: 'A'
+    sslState: 'Disabled'
+  }
+}
+
+// Pass 2 (customDomainCertificate = true): the binding already exists from pass 1, so it
+// isn't redeclared here (that would briefly strip TLS on every deploy). Issue the managed
+// certificate, then switch the binding to SNI SSL in a module, since a resource can't be
+// declared twice in one template.
+resource certificate 'Microsoft.Web/certificates@2024-04-01' = if (!empty(customDomain) && customDomainCertificate) {
+  name: '${namePrefix}-cert-${regionCode}'
+  location: location
+  properties: {
+    serverFarmId: plan.id
+    canonicalName: customDomain
+  }
+}
+
+module sslBinding 'modules/hostNameSslBinding.bicep' = if (!empty(customDomain) && customDomainCertificate) {
+  name: 'hostNameSslBinding'
+  params: {
+    appName: app.name
+    hostName: customDomain
+    thumbprint: certificate!.properties.thumbprint
+  }
+}
+
 output appName string = app.name
-output appUrl string = 'https://${app.properties.defaultHostName}'
+output appUrl string = 'https://${!empty(customDomain) ? customDomain : app.properties.defaultHostName}'
 output cosmosEndpoint string = cosmos.properties.documentEndpoint
