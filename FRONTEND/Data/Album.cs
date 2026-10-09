@@ -8,7 +8,7 @@ namespace FRONTEND.Data
     public class Album
     {
         #region PROPS
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         
         [Required(ErrorMessage = "Album name is required.")]
         public string? Name { get; set; }

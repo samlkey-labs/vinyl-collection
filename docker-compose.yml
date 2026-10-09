@@ -1,23 +1,9 @@
-version: '3.8'
-
 services:
-  backend:
-    build:
-      context: ./BACKEND
-    volumes:
-      - ./BACKEND:/app
-    ports:
-      - "5000:5000"
-    environment:
-      - FLASK_APP=app.py
-      - FLASK_ENV=development
-    restart: unless-stopped
-
   frontend:
     build:
       context: ./FRONTEND
     ports:
       - "8080:8080"
+    env_file:
+      - .env # Cosmos__ConnectionString, see .env.example
     restart: unless-stopped
-    depends_on:
-      - backend 
