@@ -12,6 +12,19 @@
 
 <PageTitle>Ranking</PageTitle>
 
+@if (rankedAlbums.Count == 0)
+{
+    if (isLoading)
+    {
+        <LoadingScreen />
+    }
+    else
+    {
+        <LoadingScreen Message="No albums in the collection yet" Spinning="false" />
+    }
+    return;
+}
+
 @{
     var currentAlbum = rankedAlbums[currentAlbumIndex];
     CurrentAlbumColorService.CurrentAlbumColor = currentAlbum.PrimaryColour ?? "#000000";
@@ -86,11 +99,13 @@
     private List<Album> albums = new List<Album>();
     private List<Album> rankedAlbums = new List<Album>();
     private int currentAlbumIndex = 0;
+    private bool isLoading = true;
     private ElementReference _keyTarget;
 
     protected override async Task OnInitializedAsync() {
         albums = await VinylService.GetAllAlbumsAsync();
         rankedAlbums = GetAlbumsByRating();
+        isLoading = false;
 
         if (rankedAlbums.Count > 0)
         {

@@ -79,9 +79,13 @@
         </div>
     </div>
 }
+else if (albums == null)
+{
+    <LoadingScreen />
+}
 else
 {
-    <p>Loading albums...</p>
+    <LoadingScreen Message="No albums in the collection yet" Spinning="false" />
 }
 
 @code {
@@ -209,7 +213,14 @@ else
 
     public async ValueTask DisposeAsync()
     {
-        await JS.InvokeVoidAsync("setHomeScrollLock", false);
+        try
+        {
+            await JS.InvokeVoidAsync("setHomeScrollLock", false);
+        }
+        catch (Exception ex) when (ex is JSDisconnectedException or InvalidOperationException)
+        {
+            // No JS available: the page was only prerendered, or the circuit has gone
+        }
     }
 
     private async void OpenSpotifyLink(string? link)

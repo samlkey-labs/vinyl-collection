@@ -13,6 +13,19 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
+@if (album == null)
+{
+    if (isLoading)
+    {
+        <LoadingScreen Message="Loading album…" />
+    }
+    else
+    {
+        <LoadingScreen Message="Album not found" Spinning="false" />
+    }
+    return;
+}
+
 @{
     CurrentAlbumColorService.CurrentAlbumColor = album?.PrimaryColour ?? "#000000";
     var textColor = CurrentAlbumColorService.TextColor;
@@ -120,6 +133,7 @@
     public string? albumName { get; set; }
 
     private Album? album;
+    private bool isLoading = true;
     private bool showAllTracks = false;
     private bool animating = false;
     private bool iframeLoading = true;
@@ -156,8 +170,9 @@
             var allAlbums = await VinylService.GetAllAlbumsAsync();
             album = allAlbums.FirstOrDefault(a => a.Name != null && a.Name.ToLower().Replace(" ", "_") == albumName.ToLower());
         }
+        isLoading = false;
 
-        if (string.IsNullOrEmpty(album!.PrimaryColour))
+        if (album != null && string.IsNullOrEmpty(album.PrimaryColour))
         {
             await album.CalculatePrimaryColourAsync(ColorService);
         }
