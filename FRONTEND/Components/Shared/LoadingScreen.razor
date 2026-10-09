@@ -1,0 +1,16 @@
+<div class="loading-screen" role="status" aria-live="polite">
+    @if (Spinning)
+    {
+        <div class="record" aria-hidden="true">
+            <div class="record-label"></div>
+        </div>
+    }
+    <p class="loading-text @(Spinning ? "pulsing" : "")">@Message</p>
+</div>
+
+@code {
+    [Parameter] public string Message { get; set; } = "Loading albums…";
+
+    // False for an end state such as "no albums", where nothing is still loading
+    [Parameter] public bool Spinning { get; set; } = true;
+}
