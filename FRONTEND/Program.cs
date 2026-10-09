@@ -1,3 +1,4 @@
+using Azure.Identity;
 using FRONTEND.Components;
 using FRONTEND.Data;
 using FRONTEND.Services;
@@ -9,12 +10,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Use project root for DB path so dotnet watch run always uses the same file
-var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "VinylCollection.db");
-
 // Database Configuration
+// In Azure, Cosmos:Endpoint is set and the app authenticates with its managed identity.
+// Locally, set Cosmos:ConnectionString (user-secrets) to use a key or the emulator instead.
+var cosmosConnectionString = builder.Configuration["Cosmos:ConnectionString"];
+var cosmosEndpoint = builder.Configuration["Cosmos:Endpoint"];
+var cosmosDatabase = builder.Configuration["Cosmos:DatabaseName"] ?? "VinylCollection";
+
 builder.Services.AddDbContext<VinylDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+{
+    // The app only reads data, so skip change tracking
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    if (!string.IsNullOrEmpty(cosmosConnectionString))
+        options.UseCosmos(cosmosConnectionString, cosmosDatabase);
+    else if (!string.IsNullOrEmpty(cosmosEndpoint))
+        options.UseCosmos(cosmosEndpoint, new DefaultAzureCredential(), cosmosDatabase);
+    else
+        throw new InvalidOperationException("Set Cosmos:ConnectionString or Cosmos:Endpoint.");
+});
 
 // Services
 builder.Services.AddScoped<IVinylService, VinylService>();
@@ -22,20 +35,6 @@ builder.Services.AddHttpClient<IColorAnalysisService, ColorAnalysisService>();
 builder.Services.AddScoped<ICurrentAlbumColorService, CurrentAlbumColorService>();
 
 var app = builder.Build();
-
-// Ensure database is created and seeded
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<VinylDbContext>();
-    var colorService = scope.ServiceProvider.GetRequiredService<IColorAnalysisService>();
-    // Delete the database file if it exists to ensure a fresh DB each run
-    if (File.Exists(dbPath))
-    {
-        File.Delete(dbPath);
-    }
-    context.Database.EnsureCreated();
-    await SeedData.SeedDatabaseAsync(context, colorService);
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

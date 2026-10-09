@@ -182,3 +182,8 @@ $tf/
 # Rider
 .idea/ 
 .fake
+# Local databases
+*.db
+
+# Local secrets
+.env

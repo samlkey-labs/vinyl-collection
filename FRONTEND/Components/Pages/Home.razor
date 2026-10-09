@@ -106,6 +106,10 @@ else
             }
         }
 
+        // Nothing to rotate through (e.g. the Cosmos container hasn't been populated yet)
+        if (albums.Count == 0)
+            return;
+
         timer = new();
         timer.Interval = 10000;
         timer.Elapsed += async (sender, e) =>
