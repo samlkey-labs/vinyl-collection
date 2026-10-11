@@ -3,6 +3,7 @@
 // Azure Portal's Data Explorer.
 //
 // Usage (from this folder):
+//   dotnet run                            uses Cosmos__ConnectionString from the repo's .env
 //   dotnet run -- "<connection string>"   key auth, also creates the database/container if missing
 //   dotnet run -- "<account endpoint>"    Entra ID auth via `az login` (needs a Cosmos data-plane role)
 
@@ -13,14 +14,15 @@ using FRONTEND.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
-if (args.Length < 1)
+var target = CosmosSettings.ConnectionString(args.ElementAtOrDefault(0));
+if (target == null)
 {
-    Console.Error.WriteLine("Usage: dotnet run -- <connection string | account endpoint> [database name]");
+    Console.Error.WriteLine($"No connection string: set {CosmosSettings.ConnectionStringKey} in .env, or pass one.");
+    Console.Error.WriteLine("Usage: dotnet run -- [connection string | account endpoint] [database name]");
     return 1;
 }
 
-var target = args[0];
-var databaseName = args.Length > 1 ? args[1] : "VinylCollection";
+var databaseName = CosmosSettings.DatabaseName(args.ElementAtOrDefault(1));
 var useKey = target.StartsWith("AccountEndpoint=", StringComparison.OrdinalIgnoreCase);
 
 var optionsBuilder = new DbContextOptionsBuilder<VinylDbContext>();

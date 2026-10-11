@@ -6,13 +6,24 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Locally, also read the repo's .env (the file docker-compose and the tools use), so the Cosmos
+// connection string lives in one place. It's added as the lowest-priority source: user-secrets
+// and environment variables still override it. Azure doesn't run as Development, so this never
+// applies there.
+if (builder.Environment.IsDevelopment())
+{
+    var dotEnv = LoadDotEnv(builder.Environment.ContentRootPath);
+    if (dotEnv.Count > 0)
+        builder.Configuration.Sources.Insert(0, new Microsoft.Extensions.Configuration.Memory.MemoryConfigurationSource { InitialData = dotEnv });
+}
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Database Configuration
 // In Azure, Cosmos:Endpoint is set and the app authenticates with its managed identity.
-// Locally, set Cosmos:ConnectionString (user-secrets) to use a key or the emulator instead.
+// Locally, set Cosmos__ConnectionString in the repo's .env (or Cosmos:ConnectionString in user-secrets).
 var cosmosConnectionString = builder.Configuration["Cosmos:ConnectionString"];
 var cosmosEndpoint = builder.Configuration["Cosmos:Endpoint"];
 var cosmosDatabase = builder.Configuration["Cosmos:DatabaseName"] ?? "VinylCollection";
@@ -61,3 +72,32 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
+
+// Reads KEY=VALUE lines from the nearest .env at or above startDir. Keys use the environment
+// variable form (Cosmos__ConnectionString), so "__" becomes the ":" configuration separator.
+static Dictionary<string, string?> LoadDotEnv(string startDir)
+{
+    var values = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+    for (var dir = new DirectoryInfo(startDir); dir != null; dir = dir.Parent)
+    {
+        var path = Path.Combine(dir.FullName, ".env");
+        if (!File.Exists(path))
+            continue;
+
+        foreach (var rawLine in File.ReadAllLines(path))
+        {
+            var line = rawLine.Trim();
+            var separator = line.IndexOf('=');
+            if (line.StartsWith('#') || separator <= 0)
+                continue;
+
+            // Split on the first '=' only: connection strings contain '=' themselves
+            var value = line[(separator + 1)..].Trim();
+            if (value.Length >= 2 && (value[0] == '"' || value[0] == '\'') && value[^1] == value[0])
+                value = value[1..^1];
+            values[line[..separator].Trim().Replace("__", ":")] = value;
+        }
+        break;
+    }
+    return values;
+}

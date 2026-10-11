@@ -26,6 +26,11 @@ namespace FRONTEND.Data
         public string? ImgSrcBack { get; set; }
         public string? BannerImg { get; set; }
 
+        // Sort key for the Ranking page, lowest first. Values are spaced out (10, 20, 30...)
+        // so an album can be slotted between two others by giving it a value in the gap,
+        // e.g. 125 between 120 and 130, without renumbering the rest. Null = unranked.
+        public double? Ranking { get; set; }
+
         public string? BestTrack { get; set; }
         public string? SpotifyLink { get; set; }
         public string? SpotifyiFrame { get; set; }
