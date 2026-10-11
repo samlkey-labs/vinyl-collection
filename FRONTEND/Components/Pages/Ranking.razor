@@ -105,7 +105,7 @@
 
     protected override async Task OnInitializedAsync() {
         albums = await VinylService.GetAllAlbumsAsync();
-        rankedAlbums = GetAlbumsByRating();
+        rankedAlbums = GetAlbumsByRanking();
         isLoading = false;
 
         if (rankedAlbums.Count > 0)
@@ -132,7 +132,12 @@
         }
     }
 
-    private List<Album> GetAlbumsByRating() => albums.OrderByDescending(a => a.Rating).ToList();
+    // Ranked albums first in Ranking order; albums without a Ranking go last, by rating
+    private List<Album> GetAlbumsByRanking() => albums
+        .OrderBy(a => a.Ranking == null)
+        .ThenBy(a => a.Ranking)
+        .ThenByDescending(a => a.Rating)
+        .ToList();
 
     private void NavigateToAlbum(string albumName)
     {

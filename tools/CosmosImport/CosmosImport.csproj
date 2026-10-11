@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\CosmosSettings.cs" Link="CosmosSettings.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\FRONTEND\FRONTEND.csproj" />
   </ItemGroup>
 

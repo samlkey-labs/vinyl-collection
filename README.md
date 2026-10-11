@@ -39,25 +39,21 @@ docker-compose.yml     Runs the app locally in Docker
 
 Only .NET 10 installed? Set `DOTNET_ROLL_FORWARD=Major` to run on it. Blazor's interactive features won't work that way, though, because `blazor.web.js` isn't served. Use Docker for a faithful local run.
 
+### Connection string
+
+Copy `.env.example` to `.env` in the repo root and fill in `Cosmos__ConnectionString`. The app (when running as `Development`), Docker Compose and the tools in `tools/` all read it. `.env` is git-ignored.
+
 ### With dotnet
 
-From `FRONTEND/`, store the connection string once in user-secrets:
-
-```bash
-dotnet user-secrets set "Cosmos:ConnectionString" "<connection string>"
-```
-
-Then start the app with hot reload:
+From `FRONTEND/`:
 
 ```bash
 dotnet watch run
 ```
 
-It runs at http://localhost:5052.
+It runs at http://localhost:5052. User-secrets or environment variables override `.env` if set.
 
 ### With Docker
-
-Copy `.env.example` to `.env`, fill in `Cosmos__ConnectionString`, then:
 
 ```bash
 docker compose up --build
@@ -69,10 +65,12 @@ It runs at http://localhost:8080. The container uses the same .NET 9 runtime as 
 
 ### Initial import
 
+The tools in `tools/` read `Cosmos__ConnectionString` from the repo's `.env`, the same file Docker uses. A connection string passed on the command line, or set as an environment variable, takes precedence.
+
 `tools/CosmosImport` loads `albums.json` into an **empty** `Albums` container and calculates each cover's colour. If the container already has data, it does nothing. From `tools/CosmosImport`:
 
 ```bash
-dotnet run -- "<connection string>"
+dotnet run
 ```
 
 ### Adding or editing albums
